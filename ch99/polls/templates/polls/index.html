@@ -1,0 +1,61 @@
+{% if latest_question_list %}
+    <ul>
+        {% for question in latest_question_list %}
+        <li><a href = "/polls/{{question.id}}/">{{ question.question_text }}</a></li>
+        {% endfor %}
+    </ul>
+
+<!--
+ <head>
+  <title> New Document </title>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+ </head>
+
+ <body>
+    <h4>
+        <a href="https://www.facebook.com/" target="a"> 페이스북</a> &nbsp;&nbsp;
+        <a href="https://www.instagram.com/?hl=ko" target="b"> 인스타그램</a> &nbsp;&nbsp;
+        <a href="https://www.youtube.com/" target="c"> 유튜브</a> &nbsp;&nbsp;
+    </h4>
+    <table border="1" width="100" height="700" cellspacing="0">
+    <tr>
+        <td width="100"> red</td>
+
+        <td width="700"><iframe src="red.html" name="a"></iframe></td>
+    </tr>
+    <tr>
+        <td>green</td>
+        <td>
+
+        <iframe src="red.html" name="a"
+         width="100%" height="100%" frameborder="0" scrolling="no"marginwidth="0" marginheight="0">
+           <p>이 문서는 &lt;iframe&gt;태그를 지원하는 웹 브라우저가 필요합니다.</p>
+        </iframe>
+
+            <iframe src="green.html" name="b"
+         width="100%" height="100%" frameborder="0" scrolling="no"marginwidth="0" marginheight="0">
+           <p>이 문서는 &lt;iframe&gt;태그를 지원하는 웹 브라우저가 필요합니다.</p>
+        </iframe>
+
+            <iframe src="blue.html" name="c"
+         width="100%" height="100%" frameborder="0" scrolling="no"marginwidth="0" marginheight="0">
+           <p>이 문서는 &lt;iframe&gt;태그를 지원하는 웹 브라우저가 필요합니다.</p>
+        </iframe>
+
+        </td>
+    </tr>
+    <tr>
+        <td>blue</td>
+        <td><iframe src="blue.html" name="c"></iframe></td>
+    </tr>
+    </table>
+
+ </body>
+-->
+
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
