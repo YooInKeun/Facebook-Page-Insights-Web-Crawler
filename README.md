@@ -28,7 +28,7 @@ Python Web Programming Study with Django Framework
 
 &nbsp;&nbsp;① 페이지 관리자는 인사이트 데이터를 필요로 할 때 Page Access Token값과 Page id값만 알면, 페이스북에 로그인 할 필요도 없이 쉽게 인사이트 데이터를 확인 가능하고, 다운로드 할 수 있다.
 
-&nbsp;&nbsp;② 장고를 토대로, 파이썬을 공부하면서 실력을 향상시킬 수 있다.
+&nbsp;&nbsp;② 장고를 토대로 파이썬을 학습하면서 웹의 구조를 이해할 수 있다.
 
 <br/>
 
