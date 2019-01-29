@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+{% load filter %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+
+<form method = "post">
+
+{% csrf_token %}
+
+<select name = "pageSelect">
+    <option value='1522501931348511'>현대건설배구단</option>
+    <option value='740318106321385'>KDB Hi뱅킹</option>
+    <option value='611418572386248'>삼성화재멤버십</option>
+    <option value='483308331873326'>맘쏙케어22</option>
+    <option value='1559207541044807'>세계한인벤처네트워크 - INKE</option>
+    <option value='1680512022212737'>홈씨씨인테리어</option>
+</select>
+
+<input  type = "submit" value="선택">
+
+</form>
+
+{% for list in lists %}
+    {% ifequal list.fb_page names %}
+
+        <li>페이지 : {{names}}</li>
+        <li>날짜 : {{list.fb_date}}</li>
+        <li>영역 : {{list.fb_metric}}</li>
+        <li>값 : {{list.fb_value }}</li>
+        <br/>
+
+    {% endifequal %}
+{% endfor %}
+
+</body>
+</html>
