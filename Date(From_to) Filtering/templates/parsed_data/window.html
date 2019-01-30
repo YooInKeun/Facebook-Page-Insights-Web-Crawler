@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+{% load filter %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+      $( function() {
+          from = $( "#from" )
+            .datepicker({
+              dateFormat: 'yy-mm-dd',
+              defaultDate: new Date(),
+              changeMonth: true,
+              numberOfMonths: 2,
+              dayNames: ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
+              dayNamesMin: ['월', '화', '수', '목', '금', '토', '일'],
+              monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+              monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
+            })
+            .on( "change", function() {
+              to.datepicker( "option", "minDate", getDate( this ) );
+            }),
+          to = $( "#to" ).datepicker({
+            dateFormat: 'yy-mm-dd',
+            defaultDate: new Date(),
+            changeMonth: true,
+            numberOfMonths: 2,
+            dayNames: ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
+            dayNamesMin: ['월', '화', '수', '목', '금', '토', '일'],
+            monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+            monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
+          })
+          .on( "change", function() {
+            from.datepicker( "option", "maxDate", getDate( this ) );
+          });
+
+        function getDate( element ) {
+          var date;
+          try {
+            date = $.datepicker.parseDate( dateFormat, element.value );
+          } catch( error ) {
+            date = null;
+          }
+          return date;
+        }
+      } );
+  </script>
+</head>
+<body>
+
+<form method = "post">
+
+{% csrf_token %}
+
+<label for="from">시작 날짜</label>
+<input type="text" id="from" name="from" autocomplete=off>
+<label for="to">종료 날짜</label>
+<input type="text" id="to" name="to" autocomplete=off>
+
+<label>페이지 선택</label>
+<select name = "pageSelect">
+    <option value='1522501931348511'>현대건설배구단</option>
+    <option value='740318106321385'>KDB Hi뱅킹</option>
+    <option value='611418572386248'>삼성화재멤버십</option>
+    <option value='483308331873326'>맘쏙케어22</option>
+    <option value='1559207541044807'>세계한인벤처네트워크 - INKE</option>
+    <option value='1680512022212737'>홈씨씨인테리어</option>
+</select>
+
+<input  type = "submit" value="확인">
+</form>
+
+<h3>{{names|get_name|safe}}</h3>
+<h4>조회 기간 : {{from}} ~ {{to}}</h4>
+
+{% for list in lists %}
+    {% ifequal list.fb_page names %} <!--페이지 이름 필터링-->
+        {% if from|get_int_date|safe <= list.fb_date|get_int_date|safe and list.fb_date|get_int_date|safe <= to|get_int_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+            <li>{{list.fb_metric|get_metric|safe}}</li>
+            <li>{{list.fb_date}} : {{list.fb_value|get_sum_value|safe}}</li>
+            <br/>
+        {% endif %}
+    {% endifequal %}
+{% endfor %}
+</body>
+</html>
