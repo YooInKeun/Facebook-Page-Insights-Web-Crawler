@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+{% load filter %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Toy Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+      $( function() {
+          from = $( "#from" )
+            .datepicker({
+              dateFormat: 'yy-mm-dd',
+              defaultDate: new Date(),
+              changeMonth: true,
+              numberOfMonths: 2,
+              dayNames: ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
+              dayNamesMin: ['월', '화', '수', '목', '금', '토', '일'],
+              monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+              monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
+            })
+            .on( "change", function() {
+              to.datepicker( "option", "minDate", getDate( this ) );
+            }),
+          to = $( "#to" ).datepicker({
+            dateFormat: 'yy-mm-dd',
+            defaultDate: new Date(),
+            changeMonth: true,
+            numberOfMonths: 2,
+            dayNames: ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
+            dayNamesMin: ['월', '화', '수', '목', '금', '토', '일'],
+            monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+            monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
+          })
+          .on( "change", function() {
+            from.datepicker( "option", "maxDate", getDate( this ) );
+          });
+
+        function getDate( element ) {
+          var date;
+          try {
+            date = $.datepicker.parseDate( dateFormat, element.value );
+          } catch( error ) {
+            date = null;
+          }
+          return date;
+        }
+      } );
+
+  </script>
+</head>
+<body>
+
+<form method = "post">
+
+{% csrf_token %}
+
+<div style="position: fixed;  left: 10px; top: 10px;">
+    <label for="from">시작 날짜</label>
+    <input type="text" id="from" name="from" autocomplete=off>
+</div>
+
+<div style="position: fixed;  left: 280px; top: 10px;">
+    <label for="to">종료 날짜</label>
+    <input type="text" id="to" name="to" autocomplete=off>
+</div>
+
+<div style="position: fixed;  left: 550px; top: 10px;">
+    <label>페이지 선택</label>
+    <select name = "pageSelect">
+        <option value='1522501931348511'>현대건설배구단</option>
+        <option value='740318106321385'>KDB Hi뱅킹</option>
+        <option value='611418572386248'>삼성화재멤버십</option>
+        <option value='483308331873326'>맘쏙케어22</option>
+        <option value='1559207541044807'>세계한인벤처네트워크 - INKE</option>
+        <option value='1680512022212737'>홈씨씨인테리어</option>
+    </select>
+</div>
+
+<div style="position: fixed;  left: 860px; top: 10px;">
+    <input  type = "submit" value="확인">
+</div>
+</form>
+
+<div style="position: fixed;  left: 10px; top: 50px;">
+    <h1>{{names|get_name|safe}}</h1>
+    <h3>조회 기간 : {{from}} ~ {{to}}</h3>
+</div>
+
+{% set zero = '0' %}
+{{list.fb_metric|set_sum_zero|safe}}
+{% set tmp_list_metric = 'page_total_actions' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+<div style="position: fixed;  left: 10px; top: 170px; "> <!-- First -->
+{% for list in lists %} <!-- 전체 Data 중에서 -->
+    {% ifequal list.fb_page names %} <!--페이지 이름 필터링-->
+        {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+            {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 1 %}
+            {% endifequal %} <!-- metric name 검사 -->
+
+            {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 0 %}
+            {% endifnotequal %} <!-- metric name 검사 -->
+
+            {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+            {% ifequal metric_count 0 %}
+            <h2>{{list.fb_metric|get_metric|safe}}</h2>
+            {% set metric_count = 1 %}
+            {% endifequal %}
+            {% endifequal %} <!-- metric 이름 출력 -->
+
+            {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+            {{list.fb_metric|set_sum_zero|safe}}
+            <br/>
+            {{list.fb_date}} : {{list.fb_value}}
+            {% ifequal list.fb_value|set_sum|safe function_execution %}
+            {% endifequal %}
+            {% endifequal %} <!-- 값 출력 -->
+
+        {% endif %}
+    {% endifequal %}
+{% endfor %}
+</div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+<div style="position: fixed;  left: 10px; top: 210px; ">
+    <h2>{{list.fb_value|get_sum|safe}}</h2>
+</div>
+
+{% endifnotequal %}
+
+{{list.fb_metric|set_sum_zero|safe}}
+{% set tmp_list_metric = 'page_views_total' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+<div style="position: fixed;  left: 275px; top: 170px; "> <!-- Second -->
+{% for list in lists %} <!-- 전체 Data 중에서 -->
+    {% ifequal list.fb_page names %} <!--페이지 이름 필터링-->
+        {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+            {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 1 %}
+            {% endifequal %} <!-- metric name 검사 -->
+
+            {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 0 %}
+            {% endifnotequal %} <!-- metric name 검사 -->
+
+            {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+            {% ifequal metric_count 0 %}
+            <h2>{{list.fb_metric|get_metric|safe}}</h2>
+            {% set metric_count = 1 %}
+            {% endifequal %}
+            {% endifequal %} <!-- metric 이름 출력 -->
+
+            {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+            {{list.fb_metric|set_sum_zero|safe}}
+            <br/>
+            {{list.fb_date}} : {{list.fb_value}}
+            {% ifequal list.fb_value|set_sum|safe function_execution %}
+            {% endifequal %}
+            {% endifequal %} <!-- 값 출력 -->
+
+        {% endif %}
+    {% endifequal %}
+{% endfor %}
+</div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+<div style="position: fixed;  left: 275px; top: 210px; ">
+    <h2>{{list.fb_value|get_sum|safe}}</h2>
+</div>
+
+{% endifnotequal %}
+
+{{list.fb_metric|set_sum_zero|safe}}
+{% set tmp_list_metric = 'page_fan_adds' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+<div style="position: fixed;  left: 525px; top: 170px; "> <!-- Third -->
+{% for list in lists %} <!-- 전체 Data 중에서 -->
+    {% ifequal list.fb_page names %} <!--페이지 이름 필터링-->
+        {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+            {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 1 %}
+            {% endifequal %} <!-- metric name 검사 -->
+
+            {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 0 %}
+            {% endifnotequal %} <!-- metric name 검사 -->
+
+            {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+            {% ifequal metric_count 0 %}
+            <h2>{{list.fb_metric|get_metric|safe}}</h2>
+            {% set metric_count = 1 %}
+            {% endifequal %}
+            {% endifequal %} <!-- metric 이름 출력 -->
+
+            {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+            {{list.fb_metric|set_sum_zero|safe}}
+            <br/>
+            {{list.fb_date}} : {{list.fb_value}}
+            {% ifequal list.fb_value|set_sum|safe function_execution %}
+            {% endifequal %}
+            {% endifequal %} <!-- 값 출력 -->
+
+        {% endif %}
+    {% endifequal %}
+{% endfor %}
+</div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+<div style="position: fixed;  left: 525px; top: 210px; ">
+    <h2>{{list.fb_value|get_sum|safe}}</h2>
+</div>
+
+{% endifnotequal %}
+
+{{list.fb_metric|set_sum_zero|safe}}
+{% set tmp_list_metric = 'page_impressions_organic' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+<div style="position: fixed;  left: 775px; top: 170px; "> <!-- Fourth -->
+{% for list in lists %} <!-- 전체 Data 중에서 -->
+    {% ifequal list.fb_page names %} <!--페이지 이름 필터링-->
+        {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+            {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 1 %}
+            {% endifequal %} <!-- metric name 검사 -->
+
+            {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 0 %}
+            {% endifnotequal %} <!-- metric name 검사 -->
+
+            {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+            {% ifequal metric_count 0 %}
+            <h2>{{list.fb_metric|get_metric|safe}}</h2>
+            {% set metric_count = 1 %}
+            {% endifequal %}
+            {% endifequal %} <!-- metric 이름 출력 -->
+
+            {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+            {{list.fb_metric|set_sum_zero|safe}}
+            <br/>
+            {{list.fb_date}} : {{list.fb_value}}
+            {% ifequal list.fb_value|set_sum|safe function_execution %}
+            {% endifequal %}
+            {% endifequal %} <!-- 값 출력 -->
+
+        {% endif %}
+    {% endifequal %}
+{% endfor %}
+</div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+<div style="position: fixed;  left: 775px; top: 210px; ">
+    <h2>{{list.fb_value|get_sum|safe}}</h2>
+</div>
+
+{% endifnotequal %}
+
+{{list.fb_metric|set_sum_zero|safe}}
+{% set tmp_list_metric = 'page_post_engagements' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+<div style="position: fixed;  left: 1025px; top: 170px; "> <!-- Fifth -->
+{% for list in lists %} <!-- 전체 Data 중에서 -->
+    {% ifequal list.fb_page names %} <!--페이지 이름 필터링-->
+        {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+            {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 1 %}
+            {% endifequal %} <!-- metric name 검사 -->
+
+            {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 0 %}
+            {% endifnotequal %} <!-- metric name 검사 -->
+
+            {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+            {% ifequal metric_count 0 %}
+            <h2>{{list.fb_metric|get_metric|safe}}</h2>
+            {% set metric_count = 1 %}
+            {% endifequal %}
+            {% endifequal %} <!-- metric 이름 출력 -->
+
+            {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+            {{list.fb_metric|set_sum_zero|safe}}
+            <br/>
+            {{list.fb_date}} : {{list.fb_value}}
+            {% ifequal list.fb_value|set_sum|safe function_execution %}
+            {% endifequal %}
+            {% endifequal %} <!-- 값 출력 -->
+
+        {% endif %}
+    {% endifequal %}
+{% endfor %}
+</div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+<div style="position: fixed;  left: 1025px; top: 210px; ">
+    <h2>{{list.fb_value|get_sum|safe}}</h2>
+</div>
+
+{% endifnotequal %}
+
+{{list.fb_metric|set_sum_zero|safe}}
+{% set tmp_list_metric = 'page_video_views' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+<div style="position: fixed;  left: 1275px; top: 170px; "> <!-- Sixth -->
+{% for list in lists %} <!-- 전체 Data 중에서 -->
+    {% ifequal list.fb_page names %} <!--페이지 이름 필터링-->
+        {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+            {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 1 %}
+            {% endifequal %} <!-- metric name 검사 -->
+
+            {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+            {% set loop_flag = 0 %}
+            {% endifnotequal %} <!-- metric name 검사 -->
+
+            {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+            {% ifequal metric_count 0 %}
+            <h2>{{list.fb_metric|get_metric|safe}}</h2>
+            {% set metric_count = 1 %}
+            {% endifequal %}
+            {% endifequal %} <!-- metric 이름 출력 -->
+
+            {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+            {{list.fb_metric|set_sum_zero|safe}}
+            <br/>
+            {{list.fb_date}} : {{list.fb_value}}
+            {% ifequal list.fb_value|set_sum|safe function_execution %}
+            {% endifequal %}
+            {% endifequal %} <!-- 값 출력 -->
+
+        {% endif %}
+    {% endifequal %}
+{% endfor %}
+</div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+<div style="position: fixed;  left: 1275px; top: 210px; ">
+    <h2>{{list.fb_value|get_sum|safe}}</h2>
+</div>
+
+{% endifnotequal %}
+
+</body>
+</html>
