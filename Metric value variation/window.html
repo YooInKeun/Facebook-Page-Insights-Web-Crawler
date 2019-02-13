@@ -1,0 +1,25 @@
+<tr> <!-- 전날 대비 증감값 출력 -->
+    <td style = "text-align : right;">{{list.fb_value}}
+        {% with temp=list.fb_value|get_diff|safe %}
+
+            {% ifequal temp|slice:"1:2" '▲' %} <!-- 값이 증가면 -->
+                <div style="display:inline; color:green">
+                    {{list.fb_value|get_diff|safe}}
+                </div>
+            {% endifequal %}
+
+            {% ifequal temp|slice:"1:2" '▼' %} <!-- 값이 감소면 -->
+                <div style="display:inline; color:red">
+                    {{list.fb_value|get_diff|safe}}
+                </div>
+            {% endifequal %}
+
+            {% ifequal temp|slice:"1:2" ' ' %} <!-- 값이 변화가 없다면 -->
+                <div style="display:inline; color:black">
+                    {{list.fb_value|get_diff|safe}}
+                </div>
+            {% endifequal %}
+
+        {% endwith %}
+    </td>
+</tr>
