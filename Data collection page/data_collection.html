@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Toy Site</title>
+</head>
+<body>
+
+<script>
+
+function enroll_confirm_MSG() {
+            if (confirm("페이지 ID와 토큰 값을 정확하게 입력하셨습니까?")) {
+                alert("페이지 등록 완료");
+                return true;
+            }
+
+            else {
+                alert("페이지 등록 취소");
+                return false;
+            }
+}
+
+function remove_confirm_MSG() {
+
+            if (confirm("페이지를 제거하면, 데이터가 모두 삭제됩니다.\n계속하시겠습니까?")) {
+                alert("페이지 제거 완료");
+                return true;
+            }
+
+            else {
+                alert("페이지 제거 취소");
+                return false;
+            }
+}
+
+</script>
+
+<h1>데이터 수집하기</h1>
+<a href="{% url 'window' %}"  style="position: absolute; left: 300px; top: 40px; font-size:16px;">초기 화면</a>
+
+    <div>
+        <form method = "post">
+
+            {% csrf_token %}
+
+            <h3>페이지 이름</h3>
+            {% for name_set in name_sets %}
+                <input name="name" type ="checkbox" value = "{{name_set.fb_page_name}}" checked = "checked">{{name_set.fb_page_name}}<br/><br/>
+            {% endfor %}
+
+            <h3>최근 몇일동안의 데이터를 수집하시겠습니까?</h3>
+
+            <input name ="days" type ="text" style="width:200px;height:21px; font-size:16px; text-align : right;" autocomplete=off>
+            (일) <input type ="submit" value ="실행" style = "height:27px; font-size:15px;" >
+        </form>
+
+        <br/>
+        <br/>
+        <br/>
+
+        <form method = "post">
+
+            <h1>페이지 등록</h1>
+            <br/>
+
+            {% csrf_token %}
+
+            <h3>페이지 ID</h3>
+            <input name ="id" type ="text"  style="width:456px; height:21px" autocomplete=off>
+            <h3>페이지 이름</h3>
+            <input name ="page_name" type ="text"  style="width:456px; height:21px" autocomplete=off>
+            <h3>토큰 값</h3>
+            <input name ="token" type ="text"  style="width:456px; height:21px" autocomplete=off>
+            <div>
+                <br/>
+                <input type ="submit" value ="등록" onclick="return enroll_confirm_MSG()"  style = "font-size:16px;">
+            </div>
+        </form>
+
+        <form method = "post">
+
+        <br/>
+        <br/>
+        <br/>
+        <h1>페이지 제거</h1>
+        <br/>
+
+        {% csrf_token %}
+
+         <h3>페이지 이름</h3>
+
+            <select name = "page_remove_select" style="width:200px;height:28px; font-size:16px;">
+            {% for name_set in name_sets %}
+                <option name="name" type ="checkbox" value = "{{name_set.fb_page_name}}">{{name_set.fb_page_name}}</option>
+            {% endfor %}
+            </select>
+             <div style = "font-size:16px;">
+                <br/>
+                <input type ="submit" value ="제거" onclick="return remove_confirm_MSG()" style = "font-size:16px;">
+            </div>
+
+        </form>
+        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    </div>
+
+</body>
+</html>
