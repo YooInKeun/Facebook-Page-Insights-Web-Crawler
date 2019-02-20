@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Toy Site</title>
+</head>
+<body>
+<script>
+
+function execution_confirm_MSG(){
+
+            if (confirm("일자를 정확하게 입력하셨습니까? 숫자를 정확하게 입력하지 않으면 오류가 납니다.\n")) {
+                alert("데이터 수집 실행");
+                return true;
+            }
+
+            else {
+                alert("데이터 수집 취소");
+                return false;
+            }
+}
+
+function enroll_confirm_MSG() {
+
+            if (confirm("페이지 ID와 토큰 값을 정확하게 입력하셨습니까?\n정확하게 입력하지 않을시에 데이터를 수집할 수 없습니다.")) {
+                alert("페이지 등록 완료");
+                return true;
+            }
+
+            else {
+                alert("페이지 등록 취소");
+                return false;
+            }
+}
+
+function remove_confirm_MSG() {
+
+            if (confirm("페이지를 제거하면, 데이터가 모두 삭제됩니다.\n계속하시겠습니까?")) {
+                alert("페이지 제거 완료");
+                return true;
+            }
+
+            else {
+                alert("페이지 제거 취소");
+                return false;
+            }
+}
+
+function doNotReload(){
+
+    if( (event.ctrlKey == true && (event.keyCode == 78 || event.keyCode == 82)) || (event.keyCode == 116)){
+        alert("새로고침을 할 수 없습니다.");
+        event.keyCode = 0;
+        event.cancelBubble = true;
+        event.returnValue = false;
+        }
+    }
+
+document.onkeydown = doNotReload;
+
+function showPopup(flag) {
+
+if(flag == true){
+        window.open("popup.html", "a", "width=400, height=300, left=100, top=50");
+        }
+    }
+
+function set_check_flag(flag){
+
+    myflag = flag;
+
+}
+
+</script>
+
+<h1>데이터 수집하기</h1>
+<a href="{% url 'window' %}"  style="position: absolute; left: 300px; top: 40px; font-size:16px;">초기 화면</a>
+
+    <div>
+        <form method = "post">
+
+            {% csrf_token %}
+
+            <h3>페이지 이름</h3>
+            {% for name_set in name_sets %}
+                <br/>
+                <input name="fb_array" type ="checkbox" value = "#{{name_set.fb_page_name}}#{{name_set.fb_page}}#{{name_set.fb_token}}#" checked = "checked" onclick = "">{{name_set.fb_page_name}}<br/><br/>
+            {% endfor %}
+
+            <h3>최근 몇일동안의 데이터를 수집하시겠습니까? (금일 제외)</h3>
+
+            <input name ="days" type ="text" style="width:200px;height:21px; font-size:16px; text-align : right;" autocomplete=off>
+            (일) <input type ="submit" value ="실행" onclick = "showPopup(return execution_confirm_MSG())" style = "height:27px; font-size:15px;">
+
+        </form>
+
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+
+        <form method = "post">
+
+            <h1>페이지 등록</h1>
+            <br/>
+
+            {% csrf_token %}
+
+            <h3>페이지 ID</h3>
+            <input name ="page_id" type ="text"  style="width:456px; height:21px" autocomplete=off>
+            <h3>페이지 이름</h3>
+            <input name ="page_name" type ="text"  style="width:456px; height:21px" autocomplete=off>
+            <h3>토큰 값</h3>
+            <input name ="page_token" type ="text"  style="width:456px; height:21px" autocomplete=off>
+            <div>
+                <br/>
+                <input type ="submit" value ="등록" onclick="return enroll_confirm_MSG()"  style = "font-size:16px;">
+            </div>
+        </form>
+
+        <form method = "post">
+
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <h1>페이지 제거</h1>
+        <br/>
+
+        {% csrf_token %}
+
+         <h3>페이지 이름</h3>
+
+            <select name = "page_remove_select" style="width:200px;height:28px; font-size:16px;">
+            {% for name_set in name_sets %}
+                <option name="remove_name" type ="checkbox" value = "{{name_set.fb_page_name}}">{{name_set.fb_page_name}}</option>
+            {% endfor %}
+            </select>
+             <div style = "font-size:16px;">
+                <br/>
+                <input type ="submit" value ="제거" onclick="return remove_confirm_MSG()" style = "font-size:16px;">
+            </div>
+
+        </form>
+        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    </div>
+
+</body>
+</html>

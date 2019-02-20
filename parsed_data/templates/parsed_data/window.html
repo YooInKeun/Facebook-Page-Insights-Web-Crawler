@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+{% load filter %}
+{% load static %}
+<html lang="en" >
+<head>
+    <meta charset="UTF-8">
+    <title>Toy Site</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/crawler.css' %}">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+      $( function() {
+          from = $( "#from" )
+            .datepicker({
+              dateFormat: 'yy-mm-dd',
+              defaultDate: -30,
+              changeMonth: true,
+              numberOfMonths: 2,
+              dayNames: ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
+              dayNamesMin: ['월', '화', '수', '목', '금', '토', '일'],
+              monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+              monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
+            })
+            .on( "change", function() {
+              to.datepicker( "option", "minDate", getDate( this ) );
+            }),
+
+          to = $( "#to" ).datepicker({
+            dateFormat: 'yy-mm-dd',
+            defaultDate: new Date(),
+            changeMonth: true,
+            numberOfMonths: 2,
+            dayNames: ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
+            dayNamesMin: ['월', '화', '수', '목', '금', '토', '일'],
+            monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+            monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
+          })
+          .on( "change", function() {
+            from.datepicker( "option", "maxDate", getDate( this ) );
+          });
+
+        function getDate( element ) {
+          var date;
+          try {
+            date = $.datepicker.parseDate( dateFormat, element.value );
+          } catch( error ) {
+            date = null;
+          }
+          return date;
+        }
+      } );
+
+var tableToExcel = (function() {
+  var uri = 'data:application/vnd.ms-excel;base64,'
+    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+    , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+    , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
+  return function(table, name) {
+    if (!table.nodeType) table = document.getElementById(table)
+    var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+    window.location.href = uri + base64(format(template, ctx))
+  }
+})()
+
+function page_fan_btn_click() {
+  alert("좋아요 : 페이지에 좋아요를 남긴 새로운 사람 수(유료 좋아요 제외)\n좋아요 취소 : 페이지 좋아요 취소\n순 좋아요 : (유기적 좋아요) + (유료 좋아요) - (좋아요 취소)\n\n※ 참고 : '유료 좋아요' 값은 이 사이트에 없습니다.");
+}
+
+function page_actions_post_btn_click() {
+	alert("일간 페이지 총 게시물 좋아요 수");
+}
+
+function page_impressions_btn_click() {
+	alert("페이지 콘텐츠 또는 페이지 관련 콘텐츠가 일반 배포를 통해 화면에 표시된 사람 수. 게시물, 체크인 및 회원님의 페이지에서 활동한 사람의 소셜 정보 등이 포함됩니다.");
+}
+
+function page_post_engagements_btn_click() {
+	alert("사람들이 좋아요, 댓글, 공유 등을 통해 게시물에 참여한 횟수");
+}
+
+    </script>
+</head>
+
+<body>
+    <form method = "post">
+
+        {% csrf_token %}
+
+        <input type ="button" style="position: absolute; left: 1480px; top: 10px; font-size:16px;" onclick="tableToExcel('tableData', '페이스북 인사이트')" value ="엑셀 다운로드">
+
+       <div style="position: absolute; left: 10px; top: 10px;">
+            <label for="from">시작 날짜</label>
+            <input type="text" id="from" name="from" autocomplete=off>
+        </div>
+
+        <div style="position: absolute; left: 280px; top: 10px;">
+            <label for="to">종료 날짜</label>
+            <input type="text" id="to" name="to" autocomplete=off>
+        </div>
+
+        <div style="position: absolute; left: 550px; top: 8px;">
+            <label>페이지 선택</label>
+            <select name = "pageSelect" style="width:200px;height:28px;">
+                {% for name_set in name_sets %}
+                    <option value = "{{name_set.fb_page_name}}#{{name_set.fb_page}}">{{name_set.fb_page_name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <style>
+        </style>
+
+        <div style="position: absolute; left: 850px; top: 10px;">
+            <input  type = "submit" value="확인">
+        </div>
+    </form>
+
+    <input type = "button" value = "데이터 수집" onclick ="location.href = 'data_collection'" style="position: absolute; left: 1496px; top: 50px; font-size:16px;">
+
+    <button style="position: absolute; left: 356px; top: 195px; font-size:16px;" onclick="page_fan_btn_click()">Description</button>
+    <button style="position: absolute; left: 733px; top: 195px; font-size:16px;" onclick="page_actions_post_btn_click()">Description</button>
+    <button style="position: absolute; left: 1170px; top: 195px; font-size:16px;" onclick="page_impressions_btn_click()">Description</button>
+    <button style="position: absolute; left: 1498px; top: 195px; font-size:16px;" onclick="page_post_engagements_btn_click()">Description</button>
+
+    <div style="position: absolute; left: 10px; top: 50px;">
+        <h1>{{name}}</h1>
+        <h3>조회 기간 : {{from}} ~ {{to}}</h3>
+    </div>
+
+    <span id = "tableData">
+
+{% set zero = '0' %}
+{{list.fb_metric|set_sum_zero|safe}}
+{% set tmp_list_metric = 'page_fan_adds_unique' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+    <div> <!-- 페이지 좋아요 -->
+        <table  style="position: absolute; left: 10px; top: 263px;">
+        {% for list in lists %} <!-- 전체 Data 중에서 -->
+            {% ifequal list.fb_page id %} <!--페이지 이름 필터링-->
+                {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+                    {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                    {% set loop_flag = 1 %}
+                    {% endifequal %}
+
+                    {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                    {% set loop_flag = 0 %}
+                    {% endifnotequal %}
+
+                    {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+                    {% ifequal metric_count 0 %}
+
+                    <div style="position: absolute; left: 10px; top: 168px;">
+                        <h2>{{list.fb_metric|get_metric|safe}}<!--<span style = "display:none;">(유기적 좋아요)</span>--></h2>
+                    </div>
+
+                    <br/>
+                    <tr>
+                        <th width=130>일 자</th>
+                        <th width=80>
+                            <span style = "display:none;">페이지 </span>
+                            좋아요
+                        </th>
+                    </tr>
+                    {% set metric_count = 1 %}
+                    {% endifequal %}
+                    {% endifequal %}
+
+                    {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+
+                    {{list.fb_metric|set_sum_zero|safe}}
+
+                    <tr>
+                        <td>{{list.fb_date}}</td>
+                        <td style = "text-align : right;">{{list.fb_value}}</td>
+                    </tr>
+
+                    {% ifequal list.fb_value|set_sum|safe function_execution %}
+                    {% endifequal %}
+
+                    {% endifequal %}
+
+                {% endif %}
+            {% endifequal %}
+        {% endfor %}
+            <tr>
+                <td>합 계</td>
+                <td style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+            <tr/>
+        </table>
+    </div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+    <div style="position: absolute; left: 144px; top: 223px; ">
+        <font size = "5"  style="font-weight:bold">
+            <table style="border: 3px solid #ffffff;">
+                <tr>
+                    <td width = 80 style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+                </tr>
+            </table>
+        </font>
+    </div>
+
+{% endifnotequal %}
+
+{{list.fb_metric|set_sum_zero|safe}}
+{% set tmp_list_metric = 'page_fan_removes_unique' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+    <div> <!-- 페이지 좋아요 취소 -->
+        <table style="position: absolute; left: 228px; top: 263px;">
+            {% for list in lists %} <!-- 전체 Data 중에서 -->
+                {% ifequal list.fb_page id %} <!--페이지 이름 필터링-->
+                    {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+                        {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                        {% set loop_flag = 1 %}
+                        {% endifequal %}
+
+                        {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                        {% set loop_flag = 0 %}
+                        {% endifnotequal %}
+
+                        {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+                        {% ifequal metric_count 0 %}
+
+                        <br/>
+                         <tr>
+                             <th style = "display:none;" width=130>일 자</th>
+                             <th width=80><span style = "display:none;">페이지 좋아요 </span>취 소</th>
+                        </tr>
+                        {% set metric_count = 1 %}
+                        {% endifequal %}
+                        {% endifequal %}
+
+                        {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+                        {{list.fb_metric|set_sum_zero|safe}}
+
+                         <tr>
+                            <td style = "display:none;">{{list.fb_date}}</td>
+                            <td style = "text-align : right;">{{list.fb_value}}</td>
+                        </tr>
+                        {% ifequal list.fb_value|set_sum|safe function_execution %}
+                        {% endifequal %}
+                        {% endifequal %}
+
+                    {% endif %}
+                {% endifequal %}
+            {% endfor %}
+            <tr>
+                <td style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+            <tr/>
+        </table>
+    </div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+    <div style="position: absolute; left: 228px; top: 223px; ">
+        <font size = "5"  style="font-weight:bold">
+            <table style="border: 3px solid #ffffff;">
+                <tr>
+                    <td width = 80 style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+                </tr>
+            </table>
+        </font>
+    </div>
+
+{% endifnotequal %}
+
+{{list.fb_metric|set_sum_zero|safe}}
+{{list.fb_value|set_val_and_cnt_zero|safe}}
+{% set tmp_list_metric = 'page_fan_pure_adds_unique' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+    <div> <!-- 페이지 순 좋아요 -->
+        <table style="position: absolute; left: 312px; top: 263px;">
+            {% for list in lists %} <!-- 전체 Data 중에서 -->
+                {% ifequal list.fb_page id %} <!--페이지 이름 필터링-->
+                    {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+                        {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                        {% set loop_flag = 1 %}
+                        {% endifequal %}
+
+                        {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                        {% set loop_flag = 0 %}
+                        {% endifnotequal %}
+
+                        {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+                        {% ifequal metric_count 0 %}
+
+                        <!--<h3 style = "display:none;">순 좋아요 = (유기적 좋아요) + (유료 좋아요) - (좋아요 취소)</h3>-->
+
+                        <br/>
+                         <tr>
+                             <th style = "display:none;" width=130>일 자</th>
+                             <th width =80><span style = "display:none;">페이지 </span>순 좋아요</th></th>
+                             <th width=50>변 화</th>
+
+                        </tr>
+                        {% set metric_count = 1 %}
+                        {% endifequal %}
+                        {% endifequal %}
+
+                        {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+                        {{list.fb_metric|set_sum_zero|safe}}
+
+                         <tr> <!-- 전날 대비 증감값 출력 -->
+                             <td style = "display:none;">{{list.fb_date}}</td>
+                             <td style = "text-align : right;">{{list.fb_value}}</td>
+                                {% with temp=list.fb_value|get_diff|safe %}
+
+                                    {% ifequal temp '' %}
+                                    <td></td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▲' %}
+                                    <td style="color:green">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▼' %}
+                                    <td style="color:red">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▪' %}
+                                    <td style=" color:black">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                {% endwith %}
+                        </tr>
+
+                        {% ifequal list.fb_value|set_sum|safe function_execution %}
+                        {% endifequal %}
+
+                        {% ifequal list.fb_value|set_val|safe function_execution %}
+                        {% endifequal %}
+
+                        {% endifequal %}
+
+                    {% endif %}
+                {% endifequal %}
+            {% endfor %}
+            <tr>
+                <td style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+            <tr/>
+        </table>
+    </div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+    <div style="position: absolute; left: 312px; top: 223px; ">
+        <font size = "5"  style="font-weight:bold">
+            <table style="border: 3px solid #ffffff;">
+                <tr>
+                    <td width = 80 style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+                </tr>
+            </table>
+        </font>
+    </div>
+
+{% endifnotequal %}
+
+{{list.fb_metric|set_sum_zero|safe}}
+{{list.fb_value|set_val_and_cnt_zero|safe}}
+{% set tmp_list_metric = 'page_actions_post_reactions_like_total' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+    <div > <!-- 페이지 총 게시물 좋아요 -->
+        <table style="position: absolute;  left: 555px; top: 263px; ">
+            {% for list in lists %} <!-- 전체 Data 중에서 -->
+                {% ifequal list.fb_page id %} <!--페이지 이름 필터링-->
+                    {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+                        {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                        {% set loop_flag = 1 %}
+                        {% endifequal %}
+
+                        {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                        {% set loop_flag = 0 %}
+                        {% endifnotequal %}
+
+                        {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+                        {% ifequal metric_count 0 %}
+
+                        <div style="position: absolute;  left: 550px; top: 168px;" >
+                            <h2>{{list.fb_metric|get_metric|safe}}</h2>
+                            <!--<h3 style = "display:none;">일간 페이지 총 게시물 좋아요 수</h3>-->
+                        </div>
+
+                        <br/>
+                        <tr>
+                            <th width=130>일 자</th>
+                            <th width=80><span style = "display:none;">게시물 </span>좋아요</th>
+                            <th width=50>변 화</th>
+                        </tr>
+                        {% set metric_count = 1 %}
+                        {% endifequal %}
+                        {% endifequal %}
+
+                        {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+                        {{list.fb_metric|set_sum_zero|safe}}
+
+                         <tr>
+                            <td>{{list.fb_date}}</td>
+
+                            <td style = "text-align : right;">{{list.fb_value}}</td>
+
+                                {% with temp=list.fb_value|get_diff|safe %}
+
+                                    {% ifequal temp '' %}
+                                    <td></td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▲' %}
+                                    <td style="color:green">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▼' %}
+                                    <td style="color:red">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▪' %}
+                                    <td style=" color:black">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                {% endwith %}
+                        </tr>
+
+                        {% ifequal list.fb_value|set_sum|safe function_execution %}
+                        {% endifequal %}
+
+                        {% ifequal list.fb_value|set_val|safe function_execution %}
+                        {% endifequal %}
+
+                        {% endifequal %}
+
+                    {% endif %}
+                {% endifequal %}
+            {% endfor %}
+            <tr>
+                <td>합 계</td>
+                <td style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+            <tr/>
+        </table>
+    </div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+    <div style="position: absolute; left: 688px; top: 223px; ">
+        <font size = "5"  style="font-weight:bold">
+            <table style="border: 3px solid #ffffff;">
+                <tr>
+                    <td width = 80 style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+                </tr>
+            </table>
+        </font>
+    </div>
+
+{% endifnotequal %}
+
+{{list.fb_metric|set_sum_zero|safe}}
+{{list.fb_value|set_val_and_cnt_zero|safe}}
+{{list.fb_value|set_imp_empty|safe}}
+{% set tmp_list_metric = 'page_impressions_organic_unique' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+    <div> <!-- 게시물 도달 -->
+        <table style="position: absolute;  left: 935px; top: 263px;">
+            {% for list in lists %} <!-- 전체 Data 중에서 -->
+                {% ifequal list.fb_page id %} <!--페이지 이름 필터링-->
+                    {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+                        {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                        {% set loop_flag = 1 %}
+                        {% endifequal %}
+
+                        {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                        {% set loop_flag = 0 %}
+                        {% endifnotequal %}
+
+                        {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+                        {% ifequal metric_count 0 %}
+
+                        <div style="position: absolute;  left: 930px; top: 168px; ">
+                            <h2>{{list.fb_metric|get_metric|safe}}</h2>
+                            <!--<h3 style = "display:none;">페이지 콘텐츠 또는 페이지 관련 콘텐츠가 일반 배포를 통해 화면에 표시된 사람 수. 게시물, 체크인 및 회원님의 페이지에서 활동한 사람의 소셜 정보 등이 포함됩니다.</h3>-->
+                         </div>
+
+                        <br/>
+                        <tr>
+                            <th width=130>일 자</th>
+                            <th width=85><span style = "display:none;">게시물 </span>도 달</th>
+                            <th width=50>변 화</th>
+                        </tr>
+                        {% set metric_count = 1 %}
+                        {% endifequal %}
+                        {% endifequal %}
+
+                        {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+                        {{list.fb_metric|set_sum_zero|safe}}
+
+                         <tr>
+                             <td>{{list.fb_date}}</td>
+
+                            {{list.fb_value|load_val|safe}}
+
+
+                             <td style = "text-align : right;">{{list.fb_value}}</td>
+                                {% with temp=list.fb_value|get_diff|safe %}
+
+                                    {% ifequal temp '' %}
+                                    <td></td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▲' %}
+                                    <td style="color:green">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▼' %}
+                                    <td style="color:red">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▪' %}
+                                    <td style=" color:black">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                {% endwith %}
+                         </tr>
+
+                        {% ifequal list.fb_value|set_sum|safe function_execution %}
+                        {% endifequal %}
+
+                        {% ifequal list.fb_value|set_val|safe function_execution %}
+                        {% endifequal %}
+
+                        {% endifequal %}
+
+                    {% endif %}
+                {% endifequal %}
+            {% endfor %}
+            <tr>
+                <td>합 계</td>
+                <td style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+            <tr/>
+        </table>
+    </div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+    <div style="position: absolute; left: 1068px; top: 223px; ">
+        <font size = "5"  style="font-weight:bold">
+            <table style="border: 3px solid #ffffff;">
+                <tr>
+                    <td width = 80 style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+                </tr>
+            </table>
+        </font>
+    </div>
+
+{% endifnotequal %}
+
+{{list.fb_metric|set_sum_zero|safe}}
+{{list.fb_value|set_val_and_cnt_zero|safe}}
+{% set tmp_list_metric = 'page_post_engagements' %}
+{% set metric_count = 0 %}
+{% set loop_flag = 0 %}
+
+    <div> <!-- 게시물 참여 -->
+        <table  style="position: absolute;  left: 1320px; top: 263px; ">
+            {% for list in lists %} <!-- 전체 Data 중에서 -->
+                {% ifequal list.fb_page id %} <!--페이지 이름 필터링-->
+                    {% if from|get_int_from_date|safe <= list.fb_date|get_int_to_date|safe and list.fb_date|get_int_to_date|safe <= to|get_int_to_date|safe %} <!--기간에 맞춰 날짜 필터링-->
+
+                        {% ifequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                        {% set loop_flag = 1 %}
+                        {% endifequal %}
+
+                        {% ifnotequal tmp_list_metric list.fb_metric %} <!-- metric name 검사 -->
+                        {% set loop_flag = 0 %}
+                        {% endifnotequal %}
+
+                        {% ifequal loop_flag 1 %} <!-- metric 이름 출력 -->
+                        {% ifequal metric_count 0 %}
+
+                        <div style="position: absolute;  left: 1315px; top: 168px; ">
+                            <h2>{{list.fb_metric|get_metric|safe}}</h2>
+                            <!--<h3 style = "display:none;">사람들이 좋아요, 댓글, 공유 등을 통해 게시물에 참여한 횟수</h3>-->
+                         </div>
+
+                        <br/>
+                        <tr>
+                            <th width=130>일 자</th>
+                            <th width=80><span style = "display:none;">게시물 </span>참 여</th>
+                            <th width=50>변 화</th>
+                            <!--<th width=50>참여율</th>-->
+                        {% set metric_count = 1 %}
+                        {% endifequal %}
+                        {% endifequal %}
+
+                        {% ifequal loop_flag 1 %} <!-- 값 출력 -->
+                        {{list.fb_metric|set_sum_zero|safe}}
+                          <tr>
+                            <td>{{list.fb_date}}</td>
+
+                            <td style = "text-align : right;">{{list.fb_value}}</td>
+
+                                {% with temp=list.fb_value|get_diff|safe %}
+
+                                    {% ifequal temp '' %}
+                                    <td></td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▲' %}
+                                    <td style="color:green">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▼' %}
+                                    <td style="color:red">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                    {% ifequal temp|slice:"0:1" '▪' %}
+                                    <td style=" color:black">{{list.fb_value|get_diff|safe}}</td>
+                                    {% endifequal %}
+
+                                {% endwith %}
+
+                                       <!--<td>{{list.fb_value|get_eng_percent|safe}}</td>-->
+
+                        </tr>
+
+                        {% ifequal list.fb_value|set_sum|safe function_execution %}
+                        {% endifequal %}
+
+                        {% ifequal list.fb_value|set_val|safe function_execution %}
+                        {% endifequal %}
+
+                        {% endifequal %}
+
+                    {% endif %}
+                {% endifequal %}
+            {% endfor %}
+            <tr>
+                <td>합 계</td>
+                <td style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+            <tr/>
+        </table>
+    </div>
+
+{% ifnotequal list.fb_value|get_sum|safe zero %}
+
+    <div style="position: absolute; left: 1458px; top: 223px; ">
+        <font size = "5"  style="font-weight:bold">
+            <table style="border: 3px solid #ffffff;">
+                <tr>
+                    <td width = 80 style = "text-align : right;">{{list.fb_value|get_sum|safe}}</td>
+                </tr>
+            </table>
+        </font>
+    </div>
+
+{% endifnotequal %}
+        </span>
+</body>
