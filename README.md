@@ -1,7 +1,7 @@
 Facebook Page Insights Web Crawler
 ==================================
 
-Python Web Programming Study with Django Framework
+Web Service Development with Python Django
 --------------------------------------------------
 
 <br/>
