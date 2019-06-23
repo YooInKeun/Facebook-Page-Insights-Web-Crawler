@@ -24,6 +24,12 @@ Web Service Development with Python Django
 
 <br/>
 
+### 구현 화면
+
+![internship image](https://user-images.githubusercontent.com/41741539/59978077-7f8cf500-9613-11e9-8cac-994f6542fde0.png)
+
+<br/>
+
 ### 프로젝트의 의미
 
 &nbsp;&nbsp;① 페이지 관리자는 인사이트 데이터를 필요로 할 때 Page Access Token값과 Page id값만 알면, 페이스북에 로그인 할 필요도 없이 쉽게 인사이트 데이터를 확인 가능하고, 다운로드 할 수 있다.
@@ -33,25 +39,3 @@ Web Service Development with Python Django
 &nbsp;&nbsp;③ 장고를 토대로 파이썬을 학습하면서 웹의 구조를 이해할 수 있다.
 
 <br/>
-
-## 기타
-
-### 커밋 내용
-
-```
-1. 장고 튜토리얼 학습 내용
-
-2. 프로젝트 관련 학습 내용
-
-3. 파이썬을 공부하면서 의미 있다고 생각하는 Source Code 
-```
-
-<br/>
-
-### 커밋 규칙
-
-```
-1. 이해 후 커밋할 것
-
-2. 의미없는 커밋은 하지 않는다
-```
