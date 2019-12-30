@@ -82,9 +82,7 @@ if __name__=='__main__':
 
     # fb_token index는 fb_page와 동일
 
-    fb_token = [
-        '~~~~'
-        ]
+    fb_token = []
 
     for i in range(0, len(fb_page)):
 

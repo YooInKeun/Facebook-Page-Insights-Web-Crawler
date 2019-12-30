@@ -93,7 +93,7 @@ fb_since = fb_until - second_to_day * int(estimate_day)
 
 # fb_token index는 fb_page와 동일
 
-fb_token = ['~~~~']
+fb_token = []
 
 page_metric_list = []  # page마다 각각의 metric data를 갖고 있음, 이중 리스트( -> (1차원)page -> (2차원)metric_list )
 metric_list = []  # fb_insight 객체 리스트

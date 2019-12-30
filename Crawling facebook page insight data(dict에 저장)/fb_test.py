@@ -4,7 +4,7 @@ import datetime
 # facebook page의 인사이트에 있는 "페이지 좋아요" 값을 날짜별로 크롤링해보자!
 # facebook for developers에서 access token 발급 받기
 
-fb_token = '~~~~'
+fb_token = ''
 
 fb_date = '1548144000' # date는 초 단위, date : 2019-01-21 00시 ~ 2019-01-21 24시(1일 : 86,400초)
 fb_metric = 'page_fan_adds' # metric=page_fan_adds : page 좋아요

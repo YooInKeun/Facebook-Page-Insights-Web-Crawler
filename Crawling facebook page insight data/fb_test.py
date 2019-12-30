@@ -4,7 +4,7 @@ import requests
 
 # facebook for developers에서 access token 발급 받기
 
-token = '~~~~'
+token = ''
 
 date = '1547884800' # date는 초 단위, date : 2019-01-18 ~ 2019-01-19(1일 : 86,400초)
 metric = 'page_fan_adds' # metric=page_fan_adds : page 좋아요

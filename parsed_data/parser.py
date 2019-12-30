@@ -162,11 +162,7 @@ if __name__=='__main__':
 
     # fb_token index는 fb_page와 동일
 
-    fb_token = [
-        'EAASXQTMvftkBANJdBhXBrcvlWntTaiqd8mtDSMSUto33Rxi2GgXUpnMy56hJBtA7BVsg46rZA6wbc1Nbvl1mldkWK06W9CB7YpZAMyIPAbLf1h5tUFs67bh9ZCZAYjbEsQl2BESPRVqW2pxxixTP0eLmolIARsZBmOh3M5KvtZAQZDZD',
-        'EAASXQTMvftkBAOCQc6lf6paCmhgwj5Dch2ZCg2QquTLurajw6C5l8f1gvirVb7eUdmmunNOu1mkTDc6v5ZBB2mlZAASUYBpgLChelsb5mC7zjkAyi7HZBmMBn7EiKjQBZByOfxETOnxqZAzp149V3AGzZC0nBXWLGGZBQLPDvloxHRVZB1s0uNZB7j',
-        'EAASXQTMvftkBAKqYZCk6XO00mmyZBSH3mzFsEryznq6dt40SpZAkyXpcADvFdgDKpVujhbhaNaOFxlbX8El9cwsOwpZBucZBgEecPdMFk5qjGKsrNFesYSleB9gAscP82lYIn1g6vaVR0RaBqaRZCwQhJzh8VQzV1ZBmtXKo1W43QZDZD'
-        ]
+    fb_token = []
 
     for i in range(0, len(fb_page)):
 
